@@ -5,7 +5,7 @@ A Model Context Protocol (MCP) server for literature RAG. Reads PDFs from Zotero
 ## Features
 
 - **Zotero Integration**: Read directly from local Zotero SQLite database
-- **Multiple Parser Support**: Prebuilt MD files (MinerU support coming in v0.2)
+- **Multiple Parser Support**: `prebuilt_md` (pre-processed Markdown files), `markitdown` (in-process PDF parsing), and `mineru` (PDF parsing via MinerU API)
 - **Vector Search**: ChromaDB with sentence-transformers embeddings
 - **RRank for improved searcheranking**: Flash results
 - **MCP Tools**: `literature_search` and `literature_qa` tools for AI assistants
@@ -113,8 +113,11 @@ literature_qa(item_key: str, question: str = "")
 | `source.type` | string | `zotero_local` | Data source type |
 | `source.zotero_db_path` | string | auto-detect | Path to Zotero SQLite database |
 | `source.storage_path` | string | auto-detect | Path to Zotero storage directory |
-| `parser.type` | string | `prebuilt_md` | Parser type |
-| `parser.md_root` | string | - | Root directory for MD files |
+| `parser.type` | string | `prebuilt_md` | Parser type: `prebuilt_md`, `markitdown`, or `mineru` |
+| `parser.md_root` | string | - | Root directory for MD files (`prebuilt_md` only) |
+| `parser.storage_path` | string | auto-detect | Zotero storage root (`markitdown`, `mineru` only; defaults to `source.storage_path`) |
+| `parser.api_url` | string | `http://localhost:8000` | MinerU API base URL (`mineru` only) |
+| `parser.lang` | string | `auto` | Language hint for MinerU (`mineru` only) |
 | `embeddings.type` | string | `sentence_transformers` | Embedding provider |
 | `embeddings.model` | string | `all-MiniLM-L6-v2` | Embedding model name |
 | `chroma_db_path` | string | `~/.config/literature-rag-mcp/chroma_db` | ChromaDB persistence path |
@@ -133,12 +136,15 @@ literature_qa(item_key: str, question: str = "")
 
 ```
 literature-rag-mcp/
-├── sources/           # Data source implementations
+├── pdf2md/           # PDF to MD conversion package
+│   ├── markitdown.py # MarkItDown converter
+│   └── converter.py  # MinerU API converter
+├── sources/          # Data source implementations
 │   ├── base.py       # AbstractSource interface
 │   └── zotero_local.py
 ├── parsers/          # Document parsers
 │   ├── base.py       # AbstractParser interface
-│   └── prebuilt_md.py
+│   └── prebuilt_md.py # Unified parser implementations
 ├── rag/              # RAG core components
 │   ├── chunkers.py
 │   ├── reranker.py
