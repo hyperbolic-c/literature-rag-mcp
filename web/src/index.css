@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Google+Sans:wght@400;500;700&display=swap');
+
+@theme {
+  --font-sans: 'Google Sans', 'Roboto', ui-sans-serif, system-ui, sans-serif;
+  
+  --color-google-blue: #4285F4;
+  --color-google-red: #EA4335;
+  --color-google-yellow: #FBBC05;
+  --color-google-green: #34A853;
+  --color-google-gray-100: #F8F9FA;
+  --color-google-gray-200: #F1F3F4;
+  --color-google-gray-300: #E8EAED;
+  --color-google-gray-400: #DADCE0;
+  --color-google-gray-700: #5F6368;
+  --color-google-gray-800: #3C4043;
+  --color-google-gray-900: #202124;
+
+  --shadow-google-sm: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+  --shadow-google-md: 0 4px 6px -1px rgba(60,64,67,0.15), 0 2px 4px -1px rgba(60,64,67,0.1);
+  --shadow-google-lg: 0 10px 15px -3px rgba(60,64,67,0.15), 0 4px 6px -2px rgba(60,64,67,0.05);
+}
+
+@layer base {
+  body {
+    @apply bg-white text-google-gray-900 font-sans antialiased;
+    margin: 0;
+  }
+}
+
+@layer utilities {
+  .google-input {
+    @apply w-full rounded-full border border-google-gray-400 hover:shadow-google-md focus:shadow-google-lg focus:outline-none px-6 py-4 text-google-gray-900 text-lg transition-shadow duration-200 bg-white;
+  }
+  
+  .google-card {
+    @apply bg-white rounded-lg border border-google-gray-300 p-6 flex flex-col gap-3 transition-shadow duration-200 hover:shadow-google-md;
+  }
+
+  .google-btn {
+    @apply px-4 py-2 text-sm font-medium rounded-md focus:outline-none transition-colors duration-200;
+  }
+  .google-btn-primary {
+    @apply bg-google-blue text-white hover:bg-[#3367D6] active:bg-[#2A56C6];
+  }
+  .google-btn-secondary {
+    @apply bg-white text-google-gray-700 border border-google-gray-400 hover:bg-google-gray-100 hover:text-google-gray-900;
+  }
+}

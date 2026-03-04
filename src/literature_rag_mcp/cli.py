@@ -101,6 +101,13 @@ def status_command(args):
     return 0
 
 
+def web_command(args):
+    """Start the FASTAPI web server to serve the frontend."""
+    from literature_rag_mcp.web_server import start_server
+    start_server(host=args.host, port=args.port, reload=args.reload)
+    return 0
+
+
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(prog="literature-rag")
@@ -115,6 +122,13 @@ def main():
     # status subcommand
     status_parser = subparsers.add_parser("status", help="Show database status")
     status_parser.set_defaults(func=status_command)
+
+    # web subcommand
+    web_parser = subparsers.add_parser("web", help="Start the web server")
+    web_parser.add_argument("--host", type=str, default="0.0.0.0", help="Host to bind to")
+    web_parser.add_argument("--port", type=int, default=8000, help="Port to bind to")
+    web_parser.add_argument("--reload", action="store_true", help="Enable auto-reload")
+    web_parser.set_defaults(func=web_command)
 
     args = parser.parse_args()
 
