@@ -5,8 +5,44 @@ import sys
 
 from literature_rag_mcp.config import load_config
 from literature_rag_mcp.sources.zotero_local import ZoteroLocalSource
-from literature_rag_mcp.parsers.prebuilt_md import PrebuiltMdParser
 from literature_rag_mcp.rag.retriever import LiteratureRAGRetriever
+from literature_rag_mcp.parsers.base import AbstractParser
+
+
+def _build_parser(config: dict) -> AbstractParser:
+    """Construct the configured parser instance.
+
+    Supported ``config["parser"]["type"]`` values:
+
+    * ``prebuilt_md`` — read pre-existing ``.md`` files (default)
+    * ``markitdown``  — in-process PDF→MD via MarkItDown (``pdf2md``)
+    * ``mineru``      — HTTP API PDF→MD via MinerU (``pdf2md``)
+    """
+    from literature_rag_mcp.parsers.prebuilt_md import (
+        PrebuiltMdParser,
+        MarkItDownParser,
+        MinerUParser,
+    )
+
+    parser_cfg = config.get("parser", {})
+    parser_type = parser_cfg.get("type", "prebuilt_md")
+    storage_path = parser_cfg.get(
+        "storage_path",
+        config.get("source", {}).get("storage_path", ""),
+    )
+
+    if parser_type == "markitdown":
+        return MarkItDownParser(storage_path=storage_path)
+
+    if parser_type == "mineru":
+        return MinerUParser(
+            storage_path=storage_path,
+            api_url=parser_cfg.get("api_url", "http://localhost:8000"),
+            lang=parser_cfg.get("lang", "auto"),
+        )
+
+    # Default: prebuilt_md
+    return PrebuiltMdParser(md_root=parser_cfg.get("md_root", ""))
 
 
 def ingest_command(args):
@@ -18,9 +54,7 @@ def ingest_command(args):
         storage_path=config["source"].get("storage_path", ""),
     )
 
-    parser = PrebuiltMdParser(
-        md_root=config["parser"].get("md_root", ""),
-    )
+    parser = _build_parser(config)
 
     # 构建 retriever 配置（与 server.py 一致）
     retriever_config = {
